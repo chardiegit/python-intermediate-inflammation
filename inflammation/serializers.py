@@ -4,6 +4,24 @@ from inflammation import models
 import json
 
 
+class Serializer:
+    @classmethod
+    def serialize(cls, instances):
+        raise NotImplementedError
+
+    @classmethod
+    def save(cls, instances, path):
+        raise NotImplementedError
+
+    @classmethod
+    def deserialize(cls, data):
+        raise NotImplementedError
+
+    @classmethod
+    def load(cls, path):
+        raise NotImplementedError
+
+
 class PatientSerializer(Serializer):
     model = models.Patient
 
@@ -42,24 +60,6 @@ class PatientJSONSerializer(PatientSerializer):
             data = json.load(jsonfile)
 
         return cls.deserialize(data)
-
-
-class Serializer:
-    @classmethod
-    def serialize(cls, instances):
-        raise NotImplementedError
-
-    @classmethod
-    def save(cls, instances, path):
-        raise NotImplementedError
-
-    @classmethod
-    def deserialize(cls, data):
-        raise NotImplementedError
-
-    @classmethod
-    def load(cls, path):
-        raise NotImplementedError
 
 
 class ObservationSerializer(Serializer):
