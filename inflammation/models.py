@@ -15,7 +15,7 @@ def load_csv(filename):
 
     :param filename: Filename of CSV to load
     """
-    return np.loadtxt(fname=filename, delimiter=',')
+    return np.loadtxt(fname=filename, delimiter=",")
 
 
 def daily_mean(data):
@@ -34,6 +34,80 @@ def daily_min(data):
 
 
 def patient_normalise(data):
-    """Normalise patient data from a 2D inflammation data array."""
-    max = np.max(data, axis=1)
-    return data / max[:, np.newaxis]
+    """
+    Normalise patient data from a 2D inflammation data array.
+
+    NaN values are ignored, and normalised to 0.
+
+    Negative values are rounded to 0.
+    """
+    if np.any(data < 0 ):
+        raise ValueError('Inflammation values should not be negative')
+    if not isinstance(data, np.ndarray):
+        raise TypeError('Wrong input data type')
+    maxima = np.nanmax(data,axis=1)
+    with np.errstate(invalid='ignore', divide='ignore'):
+        normalised = data / maxima[:,np.newaxis]
+    normalised[np.isnan(normalised)] = 0 
+    normalised[normalised < 0 ] = 0
+    return normalised
+
+
+class Observation:
+    """
+    Medical Observation
+    """
+    def __init__(self, day, value):
+        self.day = day
+        self.value = value
+
+    def __str__(self):
+        return self.value
+
+    def __eq__(self,other):
+        if self.day == other.day and self.value == other.value:
+            return True
+        else:
+            return False
+
+
+class Person:
+    """
+    Person with name
+    """
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+
+class Patient(Person):
+    """A patient in an inflammation study."""
+    def __init__(self, name, observations=None):
+        super().__init__(name)
+
+        self.observations = []
+        ### MODIFIED START ###
+        if observations is not None:
+            self.observations = observations
+        ### MODIFIED END ###
+
+    def add_observation(self, value, day=None):
+        if day is None:
+            try:
+                day = self.observations[-1].day + 1
+
+            except IndexError:
+                day = 0
+
+        new_observation = Observation(value, day)
+
+        self.observations.append(new_observation)
+        return new_observation
+
+    def __eq__(self, other):
+        if self.name == other.name and self.observations == other.observations:
+            return True
+        else:
+            return False
