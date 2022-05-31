@@ -36,3 +36,6 @@ jobs:
     - name: Test with PyTest
       run: |
         pytest --cov=inflammation.models tests/test_models.py
+        pytest --cov=inflammation.models tests/test_patient.py
+        pytest tests/test_random.py
+        pytest --cov=inflammation.serializers tests/test_serialisers.py
